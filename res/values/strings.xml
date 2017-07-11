@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">自动外呼助手</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">自动外呼助手</string>
+    <string name="title_activity_content_set">编辑短信模板</string>
+    <string name="promot">短信模板</string>
+    <string name="url">http://dayuinf.com</string>
+    <string name="hello">Hello World, JPush!</string>
+    <string name="tag_hint">Tag为大小写字母，数字，下划线,中文， 多个用以逗号分隔</string>
+    <string name="alias_hint">Alias为大小写字母，数字，下划线</string>
+    <string name="style_hint">style为数字</string>
+    <string name="error_style_empty">style不能为空</string>
+    <string name="error_alias_empty">alias不能为空</string>
+    <string name="error_tag_empty">tag不能为空</string>
+    <string name="error_tag_gs_empty">格式不对</string>
+    <string name="error_network">网络连接异常,初始化失败 请检查网络！</string>
+    <string name="logining">程序在后台执行, 请查看日志！</string>
+    <string name="setting_su">设置成功</string>
+    <string name="title_activity_managercontentplate">管理短信模板</string>
+
+    <item name="mod_key_first_tag" type="id"></item>
+    <item name="mod_key_second_tag" type="id"></item>
+
+    <string name="title_activity_reg">激活设备</string>
+    <string name="title_activity_managertask">管理外呼任务</string>
+    <string name="title_activity_start_smstask">外呼任务监控</string>
+    <string name="title_activity_addsmstask">添加外呼任务</string>
+    <string name="title_activity_sys_set">系统设置</string>
+
+</resources>
