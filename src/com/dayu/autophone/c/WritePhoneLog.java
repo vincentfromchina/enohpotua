@@ -26,8 +26,10 @@ public class WritePhoneLog extends Thread
 		DataOutputStream os = null;    
         
         //需要先创建目录 
-		//"logcat -v time -s InCall > "+
-        String cmd="logcat -v time -s InCall > "+filename; 
+		
+     //   String cmd="logcat -v time -s InCall > "+filename; 
+		
+		String cmd="logcat -v time -s CallCard -s InCallScreen > "+filename;  //三星测试
        
         String clearlog="logcat -c";   
        
@@ -55,6 +57,7 @@ public class WritePhoneLog extends Thread
 		 catch (InterruptedException e)
 		{
 			 process.destroy();
+			 MyLog.log("InterruptedException"+e);
 			e.printStackTrace();
 		}
 	

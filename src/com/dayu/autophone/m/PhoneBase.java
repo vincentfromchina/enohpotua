@@ -1,34 +1,26 @@
 package com.dayu.autophone.m;
 
+import com.dayu.autophone.c.MyLog;
+
 public class PhoneBase
 {
 	String phone_number;
-	String phone_name;
 	int    phone_timeout;
 	String[] extend_info;
 	
-	public PhoneBase(String phone_number, String phone_name)
+	public PhoneBase(String[] phone_info)
 	{
 		super();
-		this.phone_number = phone_number;
-		this.phone_name = phone_name;
+		this.extend_info = phone_info;
+
+         MyLog.log("extend_info:"+extend_info[0]+extend_info[1]);
 	}
 	public String getPhone_number()
 	{
-		return phone_number;
+		return extend_info[0];
 	}
-	public void setPhone_number(String phone_number)
-	{
-		this.phone_number = phone_number;
-	}
-	public String getPhone_name()
-	{
-		return phone_name;
-	}
-	public void setPhone_name(String phone_name)
-	{
-		this.phone_name = phone_name;
-	}
+	
+
 	public int getPhone_timeout()
 	{
 		return phone_timeout;

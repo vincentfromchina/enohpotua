@@ -88,6 +88,7 @@ public class ReadPhoneLog extends Thread
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d HH:mm:ss.S");
 						String now_time = year.format(System.currentTimeMillis())+red_buf;
 						
+						/*
 					      try
 					      {
 					    	int startpos = tmp_str.indexOf("mState");
@@ -136,22 +137,69 @@ public class ReadPhoneLog extends Thread
   	  							  MyLog.log("update time is:"+ last_UTC);
   							    }
 							 }
-						 }
-	  						   
-						   
+						 }	   
 					      } catch (ParseException e)
 					       {
 					    	  MyLog.log("some error"+now_time);
 						    e.printStackTrace();
 					       }
+					       
+					        */
+						
+						int startpos = tmp_str.indexOf("CallStatus");
+						if (startpos>=0)
+						   {
+							 MyLog.log("read buf:"+tmp_str);
+							long gettime = sdf.parse(now_time.trim()).getTime();
+							if (gettime > last_UTC)
+						    {
+								int DIALING = tmp_str.indexOf("DIALING");
+								
+								int ACTIVE = tmp_str.indexOf("ACTIVE");
+								
+	  								int disconn = tmp_str.indexOf("DISCONNECTED");
+	  								
+	  								if (DIALING>0)
+								{
+	  								   call_ok = true;
+	  								 MyLog.log("call ok");
+	  								   sessiontime = gettime;
+								}
+	  								
+  	  							if (ACTIVE>0)
+								{
+	  							    sessiontime = Long.MAX_VALUE;
+	  							  MyLog.log("call active");
+								}
+  	  							
+	  								
+	  								if (disconn>0)
+								{
+	  							    MyLog.log("call disconn");
+	  								if (!killcmd)
+									{
+	  									  killcmd = true;
+	  								 //	  process.destroy();
+	  									  this.go = false;
+  									  MyLog.log("kill writelog process");
+									}
+	  									  
+								}
+	  								
+	  								
+	  						//	  MyLog.log("this line:"+red_buf+tmp_str.substring(startpos,startpos+50));
+	  							  MyLog.log("old time is:"+ last_UTC);
+	  							   last_UTC = gettime;
+	  							  MyLog.log("update time is:"+ last_UTC);
+							    }
+						   }
 					      
 						total_filecount++;
-						
 					 }
 					
 					highwatermark =  total_filecount;
 					 MyLog.log("total_filecount:"+total_filecount+",hwm:"+highwatermark);
-					 
+						 
    			}else
    			{
    			      MyLog.log(feFile.getPath()+" file not exits");
@@ -161,6 +209,7 @@ public class ReadPhoneLog extends Thread
          }
          catch(Exception e)
          {
+        	 MyLog.log("error:"+e);
              e.printStackTrace();
          }
         

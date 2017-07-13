@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -84,7 +85,8 @@ public class StartPHONEtaskActivity extends Activity
 {
 	final static String TAG = AutoPHONEActivity.TAG;
 
-    String send_target[];
+    //String send_target[];
+	HashMap<Integer, String[]> send_target;
     int    send_num = 0;
     static int    send_totalnum = 0;
     static int    send_success = 0;
@@ -246,7 +248,9 @@ public class StartPHONEtaskActivity extends Activity
 				send_isstart = true;
 				load_finish = false;
 				PhoneTaskQuery.init_sendlist();
-			     send_target = new String[10];
+			//     send_target = new String[10];
+				send_target = new HashMap<>();
+				
 			     send_num = 0;
 			     send_success = 0;
 			     send_fail = 0;
@@ -498,14 +502,18 @@ public class StartPHONEtaskActivity extends Activity
 						if (AutoPHONEActivity.isdebug) Log.e(TAG,"load_file 线程号："+Thread.currentThread().getId());
 						readbytes += tmp_str.getBytes().length+2;
 						tmp_str = tmp_str.trim();
-						if((tmp_str.length()>0)&&(tmp_str.length()>=5)&&tmp_str.startsWith("1"))
+						if((tmp_str.length()>0)&&(tmp_str.length()>=5)&&(tmp_str.startsWith("1")||tmp_str.startsWith("0")))
 						 {	
 							extend_info = new String[tmp_str.split(",").length];
 							
 							extend_info = tmp_str.split(",");
 							
-							send_target[send_num] = extend_info[0];
+					//		send_target[send_num] = extend_info[0];
+						//	MyLog.log("queryadd"+send_target[send_num]);
+							send_target.put((Integer)send_num, extend_info);
+							
 							send_num++;
+							
 						 }
 						
 						if (AutoPHONEActivity.isdebug) Log.e(TAG,"readbytes is"+ String.valueOf(readbytes));
@@ -529,8 +537,10 @@ public class StartPHONEtaskActivity extends Activity
 							for (int i = 0; i < send_num; i++)
 							{
 								String sms_sendtext = m_PhoneTask.getPlatecontent();
-								PhoneBase t_phonebase = new PhoneBase(send_target[i],"111");
-								t_phonebase.setExtend_info(extend_info);
+							//	PhoneBase t_phonebase = new PhoneBase(send_target[i],"111");
+								PhoneBase t_phonebase = new PhoneBase(send_target.get(i));
+								
+								
 								t_phonebase.setPhone_timeout(cutdown);
 								PhoneTaskQuery.insert_sendlist(t_phonebase);
 							}
@@ -777,7 +787,7 @@ public class StartPHONEtaskActivity extends Activity
 				   
 					m_PhoneTask.setTasktotal(send_totalnum);
 				   
-				   if (AutoPHONEActivity.isdebug) Log.e(TAG, t_PhoneBase.getPhone_number()+","+t_PhoneBase.getPhone_name());
+				   if (AutoPHONEActivity.isdebug) Log.e(TAG, t_PhoneBase.getPhone_number()+",");
 				   if (AutoPHONEActivity.isdebug) Log.e(TAG,"外呼 线程号："+Thread.currentThread().getId());
 				  
 				   runOnUiThread(new Runnable()
@@ -818,9 +828,10 @@ public class StartPHONEtaskActivity extends Activity
 				   
 				   try
 					{
-						m_WritePhoneLog.join();
-
-						m_ReadPhoneLog.go = false;
+					//	m_WritePhoneLog.join();
+					    m_ReadPhoneLog.join();
+					//	m_ReadPhoneLog.go = false;
+					    m_WritePhoneLog.interrupt();
 						
 						Process process2 = Runtime.getRuntime().exec("su");
 						DeletePhoneLog m_DeletePhoneLog = new DeletePhoneLog(ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt", process2);
@@ -941,7 +952,7 @@ public class StartPHONEtaskActivity extends Activity
 			
 			 if (edt_cutdown.getText().toString().equals(""))
 				{
-				    edt_cutdown.setText("8");
+				    edt_cutdown.setText("30");
 				}
 				
 			     cutdown = Integer.valueOf(edt_cutdown.getText().toString());

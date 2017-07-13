@@ -147,6 +147,7 @@
         android:layout_below="@+id/tv_sendstatus"
         android:layout_marginTop="3dp"
         android:textSize="16sp"
+        android:visibility="gone"
         android:text="外呼成功: 0  外呼失败: 0" />
 
     <ProgressBar
