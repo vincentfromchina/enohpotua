@@ -4,6 +4,8 @@ import java.io.DataOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
+import com.dayu.autophone.StartPHONEtaskActivity;
+
 import android.util.Log;
 
 public class WritePhoneLog extends Thread
@@ -11,12 +13,15 @@ public class WritePhoneLog extends Thread
 
 	private Process process;
 	private String filename;
+	int callmode = 1;
+	String cmd = "";
 
-	public WritePhoneLog(Process process, String filename)
+	public WritePhoneLog(Process process, String filename,int callmode)
 	{
 		super();
 		this.process = process;
 		this.filename = filename;
+		this.callmode = callmode;
 	}
 
 
@@ -27,10 +32,25 @@ public class WritePhoneLog extends Thread
         
         //需要先创建目录 
 		
-     //   String cmd="logcat -v time -s InCall > "+filename; 
-		
-		String cmd="logcat -v time -s CallCard -s InCallScreen > "+filename;  //三星测试
-       
+		 switch (callmode)
+		{
+		case StartPHONEtaskActivity.CALLMODE_1:
+			//////////////////////////////小米、华为
+		     cmd="logcat -v time -s InCall > "+filename; 
+			break;
+		case StartPHONEtaskActivity.CALLMODE_2:
+			//////////////////// 三星
+	    	 cmd="logcat -v time -s CallCard -s InCallScreen > "+filename;  //三星测试
+			break;
+		case StartPHONEtaskActivity.CALLMODE_3:
+			 /////////////////// 通用
+			 cmd="logcat -v time *:D > "+filename;
+	       break;
+		default:
+			break;
+		}
+	
+      
         String clearlog="logcat -c";   
        
         

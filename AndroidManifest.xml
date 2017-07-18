@@ -13,12 +13,10 @@
         android:name="com.dayu.autophone.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="com.dayu.autophone.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.dayu.autosms.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
@@ -28,6 +26,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
@@ -42,10 +41,10 @@
 
         <meta-data
             android:name="BDAPPID"
-            android:value="9790224" />
+            android:value="9888508" />
         <meta-data
             android:name="BDAPPKEY"
-            android:value="mh1Vv2vbCqR8ho5oAQkreLQB217iCcwW" />
+            android:value="eAcWemdyE3uR55KMQ0D4lyFUgu9RuYNn" />
         <meta-data
             android:name="IS_DEBUG"
             android:value="false" />
@@ -88,7 +87,7 @@
                 <action android:name="cn.jpush.android.ui.PushActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="com.dayu.autosms" />
+                <category android:name="com.dayu.autophone" />
             </intent-filter>
         </activity>
 

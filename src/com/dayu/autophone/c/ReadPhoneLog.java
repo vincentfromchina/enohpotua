@@ -28,13 +28,15 @@ public class ReadPhoneLog extends Thread
 	private long sessiontime = 0; 
 	boolean call_ok = false;  //是否已经接通电话
 	int timeout = 30;
+	int callmode = 1;
 	
-	 public ReadPhoneLog(Process process,String filename,int timeout)
+	 public ReadPhoneLog(Process process,String filename,int timeout,int callmode)
 	{
 		super();
 		this.filename = filename;
 		this.process = process;
 		this.timeout = timeout;
+		this.callmode = callmode;
 	}
 
 
@@ -80,7 +82,14 @@ public class ReadPhoneLog extends Thread
 							continue;
 						} 
 						
-						red_buf = tmp_str.substring(0, 18);
+						if (tmp_str.length()>18)
+						{
+							red_buf = tmp_str.substring(0, 18);
+						}else {
+							total_filecount++;
+							continue;
+						}
+						
 						
 						
   					   SimpleDateFormat year = new SimpleDateFormat("yyyy-");
@@ -88,111 +97,198 @@ public class ReadPhoneLog extends Thread
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d HH:mm:ss.S");
 						String now_time = year.format(System.currentTimeMillis())+red_buf;
 						
-						/*
-					      try
-					      {
-					    	int startpos = tmp_str.indexOf("mState");
-  							if (startpos>=0)
-						   {
-	  							int somemark = tmp_str.indexOf("CallHandlerService");
-	  							if (somemark>=0)
+						switch (callmode)
+						{
+						case StartPHONEtaskActivity.CALLMODE_1:
+						////////////////////模式一 小米、华为
+							
+						      try
+						      {
+						    	int startpos = tmp_str.indexOf("mState");
+	  							if (startpos>=0)
 							   {
-  							   
-	  							long gettime = sdf.parse(now_time.trim()).getTime();
+		  							int somemark = tmp_str.indexOf("CallHandlerService");
+		  							if (somemark>=0)
+								   {
+	  							   
+		  							long gettime = sdf.parse(now_time.trim()).getTime();
+									if (gettime > last_UTC)
+	  							    {
+										int DIALING = tmp_str.indexOf("mState=DIALING");
+										
+										int ACTIVE = tmp_str.indexOf("mState=ACTIVE");
+										
+	  	  								int disconn = tmp_str.indexOf("mState=DISCONNECTED");
+	  	  								
+	  	  								if (DIALING>0)
+										{
+	  	  								   call_ok = true;
+	  	  								   sessiontime = gettime;
+										}
+	  	  								
+		  	  							if (ACTIVE>0)
+										{
+			  							    sessiontime = Long.MAX_VALUE;
+										}
+		  	  							
+	  	  								
+	  	  								if (disconn>0)
+										{
+	  	  									if (!killcmd)
+											{
+	  	  									  killcmd = true;
+	  	  									  process.destroy();
+		  									  MyLog.log("kill writelog process");
+											}
+	  	  									  
+										}
+	  	  								
+	  	  								
+	  	  							  MyLog.log("this line:"+red_buf+tmp_str.substring(startpos,startpos+50));
+	  	  							  MyLog.log("old time is:"+ last_UTC);
+	  	  							   last_UTC = gettime;
+	  	  							  MyLog.log("update time is:"+ last_UTC);
+	  							    }
+								 }
+							 }	   
+						      } catch (ParseException e)
+						       {
+						    	  MyLog.log("some error"+now_time);
+							    e.printStackTrace();
+						       }
+						       
+							break;
+						case StartPHONEtaskActivity.CALLMODE_2:
+						 /////////////////////////模式二  三星
+							
+							int startpos = tmp_str.indexOf("CallStatus");
+							if (startpos>=0)
+							   {
+								 MyLog.log("read buf:"+tmp_str);
+								long gettime = sdf.parse(now_time.trim()).getTime();
 								if (gettime > last_UTC)
-  							    {
-									int DIALING = tmp_str.indexOf("mState=DIALING");
+							    {
+									int DIALING = tmp_str.indexOf("DIALING");
 									
-									int ACTIVE = tmp_str.indexOf("mState=ACTIVE");
+									int ACTIVE = tmp_str.indexOf("ACTIVE");
 									
-  	  								int disconn = tmp_str.indexOf("mState=DISCONNECTED");
-  	  								
-  	  								if (DIALING>0)
+		  								int disconn = tmp_str.indexOf("DISCONNECTED");
+		  								
+		  								if (DIALING>0)
 									{
-  	  								   call_ok = true;
-  	  								   sessiontime = gettime;
+		  								   call_ok = true;
+		  								 MyLog.log("call ok");
+		  								   sessiontime = gettime;
 									}
-  	  								
+		  								
 	  	  							if (ACTIVE>0)
 									{
 		  							    sessiontime = Long.MAX_VALUE;
+		  							  MyLog.log("call active");
 									}
 	  	  							
-  	  								
-  	  								if (disconn>0)
+		  								
+		  								if (disconn>0)
 									{
-  	  									if (!killcmd)
+		  							    MyLog.log("call disconn");
+		  								if (!killcmd)
 										{
-  	  									  killcmd = true;
-  	  									  process.destroy();
+		  									  killcmd = true;
+		  								 //	  process.destroy();
+		  									  this.go = false;
 	  									  MyLog.log("kill writelog process");
 										}
-  	  									  
+		  									  
 									}
-  	  								
-  	  								
-  	  							  MyLog.log("this line:"+red_buf+tmp_str.substring(startpos,startpos+50));
-  	  							  MyLog.log("old time is:"+ last_UTC);
-  	  							   last_UTC = gettime;
-  	  							  MyLog.log("update time is:"+ last_UTC);
-  							    }
-							 }
-						 }	   
-					      } catch (ParseException e)
-					       {
-					    	  MyLog.log("some error"+now_time);
-						    e.printStackTrace();
-					       }
-					       
-					        */
-						
-						int startpos = tmp_str.indexOf("CallStatus");
-						if (startpos>=0)
-						   {
-							 MyLog.log("read buf:"+tmp_str);
-							long gettime = sdf.parse(now_time.trim()).getTime();
-							if (gettime > last_UTC)
-						    {
-								int DIALING = tmp_str.indexOf("DIALING");
+		  								
+		  								
+		  						//	  MyLog.log("this line:"+red_buf+tmp_str.substring(startpos,startpos+50));
+		  							  MyLog.log("old time is:"+ last_UTC);
+		  							   last_UTC = gettime;
+		  							  MyLog.log("update time is:"+ last_UTC);
+								    }
+							   }
+							break;	
+						case StartPHONEtaskActivity.CALLMODE_3:
+							///////////////// 通用
+							boolean cango = true;
+							long gettime = 0;
+							try
+							{
+								 gettime = sdf.parse(now_time.trim()).getTime();
+							} catch (ParseException e)
+							{
+								MyLog.log("time parse error.." );
+							   cango = false;
+							}
 								
-								int ACTIVE = tmp_str.indexOf("ACTIVE");
-								
-	  								int disconn = tmp_str.indexOf("DISCONNECTED");
-	  								
-	  								if (DIALING>0)
-								{
-	  								   call_ok = true;
-	  								 MyLog.log("call ok");
-	  								   sessiontime = gettime;
-								}
-	  								
-  	  							if (ACTIVE>0)
-								{
-	  							    sessiontime = Long.MAX_VALUE;
-	  							  MyLog.log("call active");
-								}
-  	  							
-	  								
-	  								if (disconn>0)
-								{
-	  							    MyLog.log("call disconn");
-	  								if (!killcmd)
+							if (!cango)
+							{
+								MyLog.log("can not go..");
+								total_filecount++;
+								continue;
+							}
+							
+								if (gettime > last_UTC)
+							    {
+									int DIALING = tmp_str.indexOf("DIALING");
+									
+									int ACTIVE = tmp_str.indexOf("ACTIVE");
+									
+		  						//	int disconn = tmp_str.indexOf("DISCONNECTD");
+		  								
+		  					    	if (DIALING>0)
 									{
-	  									  killcmd = true;
-	  								 //	  process.destroy();
-	  									  this.go = false;
-  									  MyLog.log("kill writelog process");
+		  								   call_ok = true;
+		  								 MyLog.log("call ok");
+		  								   sessiontime = gettime;
 									}
-	  									  
-								}
-	  								
-	  								
-	  						//	  MyLog.log("this line:"+red_buf+tmp_str.substring(startpos,startpos+50));
-	  							  MyLog.log("old time is:"+ last_UTC);
-	  							   last_UTC = gettime;
-	  							  MyLog.log("update time is:"+ last_UTC);
-							    }
-						   }
+		  								
+	  	  							if (ACTIVE>0)
+									{
+		  							    sessiontime = Long.MAX_VALUE;
+		  							  MyLog.log("call active");
+									}
+	  	  							
+		  							/*	
+		  							if (disconn>0)
+									{
+		  							    MyLog.log("call disconn");
+		  								if (!killcmd)
+										{
+		  									  killcmd = true;
+		  								 //	  process.destroy();
+		  									  this.go = false;
+	  									  MyLog.log("kill writelog process");
+										}
+									}
+		  							*/
+	  	  							
+	  	  							if (StartPHONEtaskActivity.isidle && call_ok)
+									{
+	  	  							 MyLog.log("call disconn");
+		  								if (!killcmd)
+										{
+		  									  killcmd = true;
+		  								 //	  process.destroy();
+		  									  this.go = false;
+										  MyLog.log("kill writelog process");
+										}
+									}
+		  								
+		  						//	  MyLog.log("this line:"+red_buf+tmp_str.substring(startpos,startpos+50));
+		  						//	  MyLog.log("old time is:"+ last_UTC);
+		  							   last_UTC = gettime;
+		  						//	  MyLog.log("update time is:"+ last_UTC);
+								    }else
+								    {
+								    	//MyLog.log("time old....");
+								    }
+							break;
+						default:
+							break;
+						}
+						
 					      
 						total_filecount++;
 					 }
@@ -211,6 +307,7 @@ public class ReadPhoneLog extends Thread
          {
         	 MyLog.log("error:"+e);
              e.printStackTrace();
+             
          }
         
      } 
@@ -230,4 +327,14 @@ public class ReadPhoneLog extends Thread
 	        } catch (Exception e) {
 	        }
 	    }
+
+
+	@Override
+	public void interrupt()
+	{
+		MyLog.log("readlog 线程退出");
+		super.interrupt();
+	}
+	 
+	 
 }

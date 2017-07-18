@@ -3,7 +3,7 @@ package com.dayu.autophone;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
-
+import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import android.text.Editable;
@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -42,35 +41,28 @@ import org.json.JSONObject;
 import com.dayu.autophone.c.DBHelper;
 import com.dayu.autophone.c.DeletePhoneLog;
 import com.dayu.autophone.c.FloatWindowService;
-import com.dayu.autophone.c.GernatorPHONEtext;
 import com.dayu.autophone.c.Getnowtime;
 import com.dayu.autophone.c.MyLog;
 import com.dayu.autophone.c.MyWindowManager;
 import com.dayu.autophone.c.ReadPhoneLog;
 import com.dayu.autophone.c.WritePhoneLog;
-import com.dayu.autophone.dummy.ThreeDES;
 import com.dayu.autophone.m.PhoneBase;
 import com.dayu.autophone.m.PhoneTask;
 import com.dayu.autophone.m.PhoneTaskQuery;
 import com.android.internal.telephony.ITelephony;
 import com.dayu.autophone.R;
 
-import android.R.integer;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -87,6 +79,8 @@ public class StartPHONEtaskActivity extends Activity
 
     //String send_target[];
 	HashMap<Integer, String[]> send_target;
+	public static final int CALLMODE_1 = 1,CALLMODE_2 = 2,CALLMODE_3 = 3;
+	static int callmode = 1;
     int    send_num = 0;
     static int    send_totalnum = 0;
     static int    send_success = 0;
@@ -114,11 +108,13 @@ public class StartPHONEtaskActivity extends Activity
 	static boolean send_finish = false;
 	public static boolean showinfo = true;
 	public static boolean checkcutdown = false;
+	public static boolean isidle=  true;
 	static long filesize = 0;
 	final static Object loadtask_lock = "导入数据共享锁";
 	final static Object sendtask_lock = "发送进程共享锁";
     static TextView tv_sendstatus;
     static TextView tv_successorfail;
+    static TextView tv_callmode_1,tv_callmode_2,tv_callmode_3;
     WritePhoneLog m_WritePhoneLog = null;
     public static int zitisize,ziticolor;
 
@@ -126,6 +122,7 @@ public class StartPHONEtaskActivity extends Activity
 	static byte[] signfromdb ;
 	private static final String ROOT = Environment
 			.getExternalStorageDirectory().toString()+"/";
+	TelephonyManager tm ;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -147,6 +144,46 @@ public class StartPHONEtaskActivity extends Activity
 		
 		
 		new Thread(r_sign).start(); //访问服务器获得注册信息
+		
+		tv_callmode_1 = (TextView)findViewById(R.id.tv_callmode_1);
+		tv_callmode_2 = (TextView)findViewById(R.id.tv_callmode_2);
+		tv_callmode_3 = (TextView)findViewById(R.id.tv_callmode_3);
+		
+		tv_callmode_1.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				callmode = CALLMODE_1;
+				tv_callmode_1.setBackgroundColor(Color.rgb(51, 255, 51));
+				tv_callmode_2.setBackgroundColor(Color.rgb(192, 192, 192));
+				tv_callmode_3.setBackgroundColor(Color.rgb(192, 192, 192));
+			}
+		});
+		
+		tv_callmode_2.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				callmode = CALLMODE_2;
+				tv_callmode_2.setBackgroundColor(Color.rgb(51, 255, 51));
+				tv_callmode_1.setBackgroundColor(Color.rgb(192, 192, 192));
+				tv_callmode_3.setBackgroundColor(Color.rgb(192, 192, 192));
+			}
+		});
+		
+		tv_callmode_3.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				callmode = CALLMODE_3;
+				tv_callmode_3.setBackgroundColor(Color.rgb(51, 255, 51));
+				tv_callmode_2.setBackgroundColor(Color.rgb(192, 192, 192));
+				tv_callmode_1.setBackgroundColor(Color.rgb(192, 192, 192));
+			}
+		});
 		
 		mProgressBar = (ProgressBar)findViewById(R.id.pbr);
 		tv_sendstatus = (TextView)findViewById(R.id.tv_sendstatus);
@@ -381,6 +418,17 @@ public class StartPHONEtaskActivity extends Activity
 			}
 		});
 		
+		//获得相应的系统服务  
+	     tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);  
+	        /** 
+	         * 返回电话状态 
+	         *  
+	         * CALL_STATE_IDLE 无任何状态时  
+	         * CALL_STATE_OFFHOOK 接起电话时 
+	         * CALL_STATE_RINGING 电话进来时  
+	         */  
+	     tm.listen(new MyPhoneCallListener(), PhoneStateListener.LISTEN_CALL_STATE);
+	     
 		   
 	    Intent  it = new Intent(StartPHONEtaskActivity.this,FloatWindowService.class);
 	    startService(it);
@@ -422,6 +470,29 @@ public class StartPHONEtaskActivity extends Activity
 		while (m_Cursor.moveToNext())
 		{
 			send_interval = m_Cursor.getInt(m_Cursor.getColumnIndex("sendinteval"));
+			callmode = m_Cursor.getInt(m_Cursor.getColumnIndex("callmode"));
+			
+			switch (callmode)
+			{
+			case CALLMODE_1:
+				tv_callmode_1.setBackgroundColor(Color.rgb(51, 255, 51));
+				tv_callmode_2.setBackgroundColor(Color.rgb(192, 192, 192));
+				tv_callmode_3.setBackgroundColor(Color.rgb(192, 192, 192));
+				break;
+			case CALLMODE_2:
+				tv_callmode_2.setBackgroundColor(Color.rgb(51, 255, 51));
+				tv_callmode_3.setBackgroundColor(Color.rgb(192, 192, 192));
+				tv_callmode_1.setBackgroundColor(Color.rgb(192, 192, 192));
+				break;
+			case CALLMODE_3:
+				tv_callmode_3.setBackgroundColor(Color.rgb(51, 255, 51));
+				tv_callmode_2.setBackgroundColor(Color.rgb(192, 192, 192));
+				tv_callmode_1.setBackgroundColor(Color.rgb(192, 192, 192));
+				break;
+			default:
+				break;
+			}
+			
 			edt_sendinteval.setText(String.valueOf(send_interval));
 			cutdown = m_Cursor.getInt(m_Cursor.getColumnIndex("cutdown"));
 			edt_cutdown.setText(String.valueOf(cutdown));
@@ -742,12 +813,12 @@ public class StartPHONEtaskActivity extends Activity
 							f.mkdirs();
 						}
 						
-						 m_WritePhoneLog = new WritePhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt");
+						 m_WritePhoneLog = new WritePhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt",callmode);
 						m_WritePhoneLog.start();
 						
 						sleep(1000);
 						
-						 m_ReadPhoneLog = new ReadPhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt",t_PhoneBase.getPhone_timeout());
+						 m_ReadPhoneLog = new ReadPhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt",t_PhoneBase.getPhone_timeout(),callmode);
 						m_ReadPhoneLog.start();
 						
 						
@@ -922,6 +993,7 @@ public class StartPHONEtaskActivity extends Activity
 	 sqldb.update_inteval(send_interval);
 	 sqldb.update_cutdown(cutdown);
 	 sqldb.update_iscutdown(tgbtn_checkcutdown.isChecked());
+	 sqldb.update_callmode(callmode);
 	 
 	 rejectCall();
 	 
@@ -1251,5 +1323,26 @@ public class StartPHONEtaskActivity extends Activity
 	}
 	
 	*/
+	
+	 public class MyPhoneCallListener extends PhoneStateListener  
+	 {  
+	   
+		 @Override  
+		 public void onCallStateChanged(int state, String incomingNumber)  
+		 {  
+		   
+		   switch (state) {  
+		     case TelephonyManager.CALL_STATE_IDLE:                   //电话通话的状态  
+		    	 isidle = true;
+		    	 MyLog.log("空闲状态");
+		         break;  
+		      default:
+		    	  isidle = false;
+		    	  MyLog.log("callstate: unknow"); 
+		       break;
+		   }  
+		   super.onCallStateChanged(state, incomingNumber);  
+		 }  
+	 }
 
 }

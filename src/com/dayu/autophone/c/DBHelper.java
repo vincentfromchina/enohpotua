@@ -22,7 +22,7 @@ public class DBHelper extends SQLiteOpenHelper
 {
 	
 	private static final String DB_NAME = "autophonetask.db";  
-    private static final int DB_VERSION = 4;    
+    private static final int DB_VERSION = 5;    
     private static final String CREATE_phonetask = "create table if not exists phonetask("  
             + "taskStarttime DATETEXT(19,19),"
             + "taskEndtime DATETEXT(19,19),"
@@ -46,11 +46,12 @@ public class DBHelper extends SQLiteOpenHelper
     		+ "zitisize INT DEFAULT 17, "
     		+ "ziticolor INT DEFAULT 4 ,"
     		+"iscutdown BOOLEAN DEFAULT 0,"
+    		+"callmode INT DEFAULT 1,"
     		+"sendinteval INT DEFAULT 1)";
     
     private static final String insert_config = "insert into config(sendinteval,"
-    		+ "cutdown,showinfo,zitisize,ziticolor)"
-    		+"values(1,8,1,17,4)";
+    		+ "cutdown,showinfo,zitisize,ziticolor,callmode)"
+    		+"values(1,8,1,17,4,1)";
    
 
 	public DBHelper(Context context, String dbname, CursorFactory factory)
@@ -234,6 +235,13 @@ public class DBHelper extends SQLiteOpenHelper
     	SQLiteDatabase db = getReadableDatabase();
     	if (AutoPHONEActivity.isdebug) Log.e("database","update config set ziticolor="+ziticolor);  
         db.execSQL("update config set ziticolor="+ziticolor);
+    }
+    
+    public void update_callmode(int callmode)
+    {
+    	SQLiteDatabase db = getReadableDatabase();
+    	if (AutoPHONEActivity.isdebug) Log.e("database","update config set callmode="+callmode);  
+        db.execSQL("update config set callmode="+callmode);
     }
     
     public void update_iscutdown(boolean iscutdown)
