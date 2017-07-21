@@ -1,5 +1,7 @@
 package com.dayu.autophone.c;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -18,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -36,6 +39,9 @@ public class FloatWindowService extends Service
     
     NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
+    
+    private static final String ROOT = Environment
+			.getExternalStorageDirectory().toString()+"/";
   
     @Override  
     public IBinder onBind(Intent intent) {  
@@ -93,6 +99,43 @@ public class FloatWindowService extends Service
         timer = null;  
         
         mNotificationManager.cancel(123);
+        
+        try
+		{
+			final Process process = Runtime.getRuntime().exec("su");
+			 new Thread(new Runnable()
+				{
+					public void run()
+					{
+						DataOutputStream os = null; 
+						os = new DataOutputStream(process.getOutputStream());  
+						try
+						{
+							os.writeBytes("cd "+ROOT+"Bddlfs/dtls/" + "\n");
+							os.flush(); 
+							
+							os.writeBytes("rm *" + "\n");  
+				            os.flush();    
+						} catch (IOException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}  
+						MyLog.log("clearlog");
+					  
+					}
+				}).start();
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        if (StartPHONEtaskActivity.m_ReadPhoneLog.isAlive())
+		{
+        	StartPHONEtaskActivity.m_ReadPhoneLog.interrupt();
+		}
+        
     }  
   
     class RefreshTask extends TimerTask {  

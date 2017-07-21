@@ -115,7 +115,8 @@ public class StartPHONEtaskActivity extends Activity
     static TextView tv_sendstatus;
     static TextView tv_successorfail;
     static TextView tv_callmode_1,tv_callmode_2,tv_callmode_3;
-    WritePhoneLog m_WritePhoneLog = null;
+    static WritePhoneLog m_WritePhoneLog = null;
+    public static ReadPhoneLog m_ReadPhoneLog = null;
     public static int zitisize,ziticolor;
 
 	static boolean teac = false;
@@ -543,14 +544,14 @@ public class StartPHONEtaskActivity extends Activity
 			
 			File feFile = new File(mfilePath);
 			
-			if (AutoPHONEActivity.isdebug) Log.e(TAG, "open file  AbsolutePath"+feFile.getAbsolutePath());
+			if (AutoPHONEActivity.isdebug) Log.e(TAG, "open file  AbsolutePath: "+feFile.getAbsolutePath());
 			
-			if (AutoPHONEActivity.isdebug) Log.e(TAG, "open file  name" +feFile.getName());
+			if (AutoPHONEActivity.isdebug) Log.e(TAG, "open file  name: " +feFile.getName());
 			if(feFile.canRead())
 			{
 				FileReader frd = null;
 				filesize = feFile.length();
-				if (AutoPHONEActivity.isdebug) Log.e(TAG,"filesize is"+ String.valueOf(filesize));
+				if (AutoPHONEActivity.isdebug) Log.e(TAG,"filesize is: "+ String.valueOf(filesize));
 				BufferedReader buffd = null;
 				try
 				{
@@ -587,7 +588,7 @@ public class StartPHONEtaskActivity extends Activity
 							
 						 }
 						
-						if (AutoPHONEActivity.isdebug) Log.e(TAG,"readbytes is"+ String.valueOf(readbytes));
+						if (AutoPHONEActivity.isdebug) Log.e(TAG,"readbytes is: "+ String.valueOf(readbytes));
 						
 						progessperct =  Math.round((float)readbytes/filesize*100);
 						
@@ -625,7 +626,7 @@ public class StartPHONEtaskActivity extends Activity
 							{
 								mylife = false;
 								
-								if (AutoPHONEActivity.isdebug)  Log.e(TAG,"signfromdbd"+ signfromdb.toString());
+								if (AutoPHONEActivity.isdebug)  Log.e(TAG,"signfromdbd: "+ signfromdb.toString());
 							  if (signfromdb != null)
 							   {
 								  runOnUiThread(new Runnable()
@@ -654,7 +655,6 @@ public class StartPHONEtaskActivity extends Activity
 									loadtask_lock.wait();
 								} catch (InterruptedException e)
 								{
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -686,11 +686,11 @@ public class StartPHONEtaskActivity extends Activity
 		
 				} catch (FileNotFoundException e)
 				{
-					
+					MyLog.log(""+e);
 					e.printStackTrace();
 				} catch (IOException e)
 				{
-					
+					MyLog.log(""+e);
 					e.printStackTrace();
 				}finally {
 					if (buffd!=null)
@@ -700,7 +700,7 @@ public class StartPHONEtaskActivity extends Activity
 							buffd.close();
 						} catch (IOException e)
 						{
-							
+							MyLog.log(""+e);
 							e.printStackTrace();
 						}
 					}
@@ -712,7 +712,7 @@ public class StartPHONEtaskActivity extends Activity
 							frd.close();
 						} catch (IOException e)
 						{
-							
+							MyLog.log(""+e);
 							e.printStackTrace();
 						}
 					}
@@ -801,7 +801,6 @@ public class StartPHONEtaskActivity extends Activity
 				   
 				   Process process;
 				  
-				   ReadPhoneLog m_ReadPhoneLog = null;
 					try
 					{
 						process = Runtime.getRuntime().exec("su");

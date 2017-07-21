@@ -362,11 +362,11 @@ public class AddphonetaskActivity extends Activity
 							{
 								if (onecontact[2].equals("1") && (onecontact[1] != null))
 								{
-									if (AutoPHONEActivity.isdebug) Log.e(TAG, onecontact[0] + onecontact[1]);
+									if (AutoPHONEActivity.isdebug) Log.e(TAG, onecontact[0] +" "+ onecontact[1]);
 									String replacestr = onecontact[1].replace(" ", "");
 									replacestr = replacestr.replace("-", "");
 									replacestr = replacestr.replace("+", "");
-									bufwrd.write(replacestr);
+									bufwrd.write(replacestr+","+onecontact[0]);
 									bufwrd.newLine();
 								}
 							}

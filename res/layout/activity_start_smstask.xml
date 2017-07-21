@@ -183,12 +183,26 @@
          android:layout_alignParentRight="true"
          android:text="自动挂断" />
      
+     <TextView 
+            android:id="@+id/tv_sadf"
+             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:textSize="16sp"
+            android:layout_margin="3dp"
+            android:padding="10dp"
+            android:layout_below="@+id/sel_mode"
+            android:text="由于android系统rom众多，不同手机可以使用不同的模式，推荐使用模式一和模式二，如果三种模式都不能正常外呼，说明你的手机rom和本软件不兼容。"
+             />
+     
      <LinearLayout 
+         android:id="@+id/sel_mode"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:orientation="horizontal"
-         android:layout_below="@+id/pbr"
          android:layout_marginTop="10dp"
+         android:layout_below="@+id/pbr"
          >
          
          <TextView 
