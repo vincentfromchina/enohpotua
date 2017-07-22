@@ -133,7 +133,7 @@ public class FloatWindowService extends Service
 			e.printStackTrace();
 		}
         
-        if (StartPHONEtaskActivity.m_ReadPhoneLog.isAlive())
+        if (StartPHONEtaskActivity.m_ReadPhoneLog.isAlive() && StartPHONEtaskActivity.m_ReadPhoneLog != null)
 		{
         	StartPHONEtaskActivity.m_ReadPhoneLog.interrupt();
 		}
