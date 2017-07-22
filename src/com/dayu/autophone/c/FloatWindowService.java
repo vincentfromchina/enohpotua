@@ -100,6 +100,8 @@ public class FloatWindowService extends Service
         
         mNotificationManager.cancel(123);
         
+        MyWindowManager.showcallinfo = " ";
+        
         try
 		{
 			final Process process = Runtime.getRuntime().exec("su");
@@ -188,6 +190,11 @@ public class FloatWindowService extends Service
         }  
   
     }  
+    
+    public static void changefolattext(String msg)
+    {
+    	FloatWindowSmallView.updateFolatText(msg);
+    }
   
     /** 
      * 判断当前界面是否是桌面 

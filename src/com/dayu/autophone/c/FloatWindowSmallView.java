@@ -20,6 +20,7 @@ public class FloatWindowSmallView extends LinearLayout
 	
 	public static  int txsize = 18;
 
+	static TextView percentView;
 	/** 
      * 记录小悬浮窗的宽度 
      */  
@@ -84,7 +85,7 @@ public class FloatWindowSmallView extends LinearLayout
 		   viewWidth = view.getLayoutParams().width;  
         viewHeight = view.getLayoutParams().height;  
 
-        TextView percentView = (TextView) findViewById(R.id.percent);  
+        percentView = (TextView) findViewById(R.id.percent);  
        // percentView.setText(MyWindowManager.getUsedPercentValue(context));  
         percentView.setText(MyWindowManager.showcallinfo);
         percentView.setTextColor(txcolor);
@@ -130,6 +131,13 @@ public class FloatWindowSmallView extends LinearLayout
      */  
     public void setParams(WindowManager.LayoutParams params) {  
         mParams = params;  
+    }  
+    
+    /** 
+     * 更新小悬浮窗的文字内容。 
+     */  
+    public static void updateFolatText(String str) {  
+    	 percentView.setText(str);
     }  
   
     /** 

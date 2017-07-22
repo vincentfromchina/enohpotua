@@ -12,6 +12,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -414,6 +415,8 @@ public class StartPHONEtaskActivity extends Activity
 				   { 
 					   rejectCall();
 					   btn_sendpause.setText("继续");
+					   
+					   FloatWindowService.changefolattext(" ");
 				   }	
 				
 			}
@@ -433,6 +436,37 @@ public class StartPHONEtaskActivity extends Activity
 		   
 	    Intent  it = new Intent(StartPHONEtaskActivity.this,FloatWindowService.class);
 	    startService(it);
+	    
+	    try
+		{
+			final Process process = Runtime.getRuntime().exec("su");
+			 new Thread(new Runnable()
+				{
+					public void run()
+					{
+						DataOutputStream os = null; 
+						os = new DataOutputStream(process.getOutputStream());  
+						try
+						{
+							os.writeBytes("cd "+ROOT+"Bddlfs/dtls/" + "\n");
+							os.flush(); 
+							
+							os.writeBytes("rm *" + "\n");  
+				            os.flush();    
+						} catch (IOException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}  
+						MyLog.log("clearlog");
+					  
+					}
+				}).start();
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -574,7 +608,7 @@ public class StartPHONEtaskActivity extends Activity
 						if (AutoPHONEActivity.isdebug) Log.e(TAG,"load_file 线程号："+Thread.currentThread().getId());
 						readbytes += tmp_str.getBytes().length+2;
 						tmp_str = tmp_str.trim();
-						if((tmp_str.length()>0)&&(tmp_str.length()>=5)&&(tmp_str.startsWith("1")||tmp_str.startsWith("0")))
+						if((tmp_str.length()>0)&&(tmp_str.length()>=5))
 						 {	
 							extend_info = new String[tmp_str.split(",").length];
 							
@@ -626,9 +660,10 @@ public class StartPHONEtaskActivity extends Activity
 							{
 								mylife = false;
 								
-								if (AutoPHONEActivity.isdebug)  Log.e(TAG,"signfromdbd: "+ signfromdb.toString());
+						
 							  if (signfromdb != null)
 							   {
+								  if (AutoPHONEActivity.isdebug)  Log.e(TAG,"signfromdbd: "+ signfromdb.toString());
 								  runOnUiThread(new Runnable()
 									{
 										public void run()
@@ -812,12 +847,12 @@ public class StartPHONEtaskActivity extends Activity
 							f.mkdirs();
 						}
 						
-						 m_WritePhoneLog = new WritePhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt",callmode);
+						 m_WritePhoneLog = new WritePhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number(),callmode);
 						m_WritePhoneLog.start();
 						
 						sleep(1000);
 						
-						 m_ReadPhoneLog = new ReadPhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number()+".txt",t_PhoneBase.getPhone_timeout(),callmode);
+						 m_ReadPhoneLog = new ReadPhoneLog(process, ROOT+"Bddlfs/dtls/"+t_PhoneBase.getPhone_number(),t_PhoneBase.getPhone_timeout(),callmode);
 						m_ReadPhoneLog.start();
 						
 						
@@ -1101,6 +1136,8 @@ public class StartPHONEtaskActivity extends Activity
 	            {  
 	            case AlertDialog.BUTTON_POSITIVE:// "确认"按钮退出程序  
 	            	
+	            	FloatWindowService.changefolattext(" ");
+	            	
 	            	stop_sendtask();
 	                finish();  
 	                break;  
@@ -1323,7 +1360,15 @@ public class StartPHONEtaskActivity extends Activity
 	
 	*/
 	
-	 public class MyPhoneCallListener extends PhoneStateListener  
+	 @Override
+	public void finish()
+	{
+		 FloatWindowService.changefolattext(" ");
+		 
+		super.finish();
+	}
+
+	public class MyPhoneCallListener extends PhoneStateListener  
 	 {  
 	   
 		 @Override  
