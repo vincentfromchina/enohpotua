@@ -158,10 +158,10 @@ public class AutoPHONEActivity extends Activity implements OnClickListener
 	       tv_shownoroot = (TextView)findViewById(R.id.tv_shownoroot);
 	     
 	//检查软件版本
-	    /*
+	    
 		checkupdate ck = new checkupdate();
 		ck.start();
-	   */
+	   
 	}
 	
 
@@ -519,7 +519,7 @@ public class AutoPHONEActivity extends Activity implements OnClickListener
 				 int recode = 0;
 			        try{  
 			            //通过openConnection 连接  
-			            URL url = new java.net.URL(getResources().getString(R.string.url)+"/autosms/updateversion.html");  
+			            URL url = new java.net.URL(getResources().getString(R.string.url)+"/autophone/updateversion.html");  
 			            urlConn=(HttpURLConnection)url.openConnection();  
 			            //设置输入和输出流   
 			            urlConn.setDoOutput(true);  

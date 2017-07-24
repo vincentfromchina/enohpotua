@@ -13,7 +13,7 @@ public class PhoneBase
 		super();
 		this.extend_info = phone_info;
 
-         MyLog.log("extend_info:"+extend_info[0]+extend_info[1]);
+       //  MyLog.log("extend_info:"+extend_info[0]+extend_info[1]);
 	}
 	public String getPhone_number()
 	{
