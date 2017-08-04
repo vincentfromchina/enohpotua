@@ -496,7 +496,7 @@ public class StartPHONEtaskActivity extends Activity
 	    TextView  tv_sendinfo = (TextView)findViewById(R.id.tv_sendinfo);
 	    tv_sendinfo.setText(tv_sendinfo.getText().toString()+"\t\t"+ m_PhoneTask.getTaskname()+"\r\n文件路径："+mfilePath);
 		
-	    EditText  edt_showresult = (EditText)findViewById(R.id.edt_showresult);
+	 //   EditText  edt_showresult = (EditText)findViewById(R.id.edt_showresult);
 	 //   edt_showresult.setText(GernatorPHONEtext.getSMSresult(m_PhoneTask.getPlatecontent()));
 	    
 		m_Cursor =  sqldb.get_config();
@@ -642,7 +642,7 @@ public class StartPHONEtaskActivity extends Activity
 							
 							for (int i = 0; i < send_num; i++)
 							{
-								String sms_sendtext = m_PhoneTask.getPlatecontent();
+							//	String sms_sendtext = m_PhoneTask.getPlatecontent();
 							//	PhoneBase t_phonebase = new PhoneBase(send_target[i],"111");
 								PhoneBase t_phonebase = new PhoneBase(send_target.get(i));
 								
@@ -756,6 +756,14 @@ public class StartPHONEtaskActivity extends Activity
 			}else
 			{
 				if (AutoPHONEActivity.isdebug) Log.e(TAG, "读取文件出错");
+				
+				runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+						Toast.makeText(StartPHONEtaskActivity.this, "读取文件异常，请删除任务后重新添加", Toast.LENGTH_LONG).show();
+					}
+				});
 			}
 		}
 		

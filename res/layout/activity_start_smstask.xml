@@ -193,7 +193,7 @@
             android:layout_margin="3dp"
             android:padding="10dp"
             android:layout_below="@+id/sel_mode"
-            android:text="由于android系统rom众多，不同手机可以使用不同的模式，推荐使用模式一和模式二，如果三种模式都不能正常外呼，说明你的手机rom和本软件不兼容,推荐使用 Miui系统4.x 的rom"
+            android:text="由于android系统rom众多，为提高软件兼容度，有三种模式选择，不同手机可以使用不同的模式，推荐使用模式一和模式二，如果三种模式都不能正常外呼，说明你的手机rom和本软件不兼容,推荐使用 Miui系统4.x 的rom"
              />
      
      <LinearLayout 
